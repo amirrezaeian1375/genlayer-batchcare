@@ -1,6 +1,6 @@
 # BatchCare design boundary
 
-Status: local contract and tests complete; **not deployed**. This is a recorded-instructions and authorization primitive, not a textile-safety assessor.
+Status: local contract and tests complete; two distinct full-consensus Studionet reviews and their finalized state reads are documented in [DEPLOY.md](DEPLOY.md). This is a recorded-instructions and authorization primitive, not a textile-safety assessor.
 
 ## The hard question
 

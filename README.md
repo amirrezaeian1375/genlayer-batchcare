@@ -2,7 +2,7 @@
 
 A dry cleaner can process several garments in one machine cycle only when the **recorded care instructions for every item** support the same settings. BatchCare is a standalone GenLayer contract for checking a proposed professional-cleaning batch and issuing a one-use, plan-bound ticket when all its owner-confirmed instructions agree.
 
-**Status:** local prototype. `genvm-lint check` and type checking pass; 35 Direct Mode tests pass with a mocked LLM. There is **no deployment or live validator receipt yet**. Do not submit this as a verified GenLayer build until the live paths have been exercised and linked.
+**Status:** deployed and exercised on GenLayer Studionet (chain 61999). The contract has 16 finalized transactions with successful GenVM execution: an admitted batch, a consumed one-use ticket and a second batch rejected as incompatible. Local GenVM lint/typecheck and 35 Direct Mode tests passed. This is hosted-development evidence, not mainnet or physical-cleaning proof.
 
 ## What it decides
 
@@ -51,10 +51,26 @@ From this repository root (Python 3.12+):
 
 Keep the virtual environment activated so the preparation script can find `genvm-lint` on your PATH. The preparation script only bridges an upstream SDK release-asset name mismatch. The 35 local tests exercise the actual contract with a mocked model: two-party confirmations, immutable seals, compatible and blocked batches, ambiguity holds, malicious leader results, wrong quotes, unauthorized calls and replayed tickets. Direct Mode is not a distributed validator test.
 
+## Live Studionet evidence
+
+Contract: [`0x4D34b41d39c493fC9F306004EaA600c91b902203`](https://explorer-studio.genlayer.com/address/0x4D34b41d39c493fC9F306004EaA600c91b902203). Operator: `0x3d9E39265d74511065f88C987f898c1d02892f3e`; the second item's owner confirmed from a different address. All links below are finalized transactions with successful execution and accepted consensus.
+
+| Step | Transaction | Result |
+| --- | --- | --- |
+| Deploy | [`0x597a9e4b...b941e0d5`](https://explorer-studio.genlayer.com/tx/0x597a9e4ba7a439dcca12890f331ec81964d780a1107d5517997fed9db941e0d5) | Contract deployed. |
+| Second owner's confirmation, batch `0` | [`0x7b27ae91...031bd942`](https://explorer-studio.genlayer.com/tx/0x7b27ae91710229f280edbb1cbe49699390dcd27601b119893f3a2ef4031bd942) | Distinct owner signed the frozen batch seal. |
+| Review batch `0` | [`0xbec10524...ce3e0edd`](https://explorer-studio.genlayer.com/tx/0xbec105240a281cf6dc44f11d7637457d0bfef020edce976440d9369cce3e0edd) | `ADMISSIBLE`; both garments' method and intensity were `ALLOW`. |
+| Consume its ticket | [`0x81860560...4c71f418`](https://explorer-studio.genlayer.com/tx/0x81860560995d1c0928353f0122996c9cb0e206d79f885c860ba954ac4c71f418) | Operator used the plan-bound ticket once. |
+| Review batch `1` | [`0xad21fc32...6a59a8c7`](https://explorer-studio.genlayer.com/tx/0xad21fc32e47671caf949b33a9d50d3753cada266b0761e2f7fd39e6a6a59a8c7) | `SPLIT_BATCH`; garment `0` excludes the proposed `PCE` method. |
+
+Finalized reads in Studio returned `CONSUMED` for batch `0` and `SPLIT_BATCH` with `blocked=[0]`, `ticket=""` for batch `1`. The labels were synthetic, public test inputs, not photographed physical garments. The full 16-transaction sequence, both seals and source-parity check are in [docs/DEPLOY.md](docs/DEPLOY.md).
+
+Studio stored the deployed source with CRLF line endings and no final newline. Its **raw SHA-256 differs** from the GitHub file; after normalizing only those line endings, the source text matches. Do not claim byte-for-byte source equality.
+
 ## Related work and limits
 
 [CareLabelGuide](https://github.com/paulinx2nd/carelabelguide) already compiles single-garment written instructions into a wash/bleach/dry/iron cycle automaton. BatchCare instead judges **a shared professional-cleaning plan against several owner-confirmed items** and issues a single-use batch ticket; no code is copied from that project. Grouping garments by care labels is not a new idea outside GenLayer, and this project makes no first-ever claim.
 
-This contract does not authenticate a sewn-in label or measure chemical compatibility, dye transfer, actual machine use, or garment damage. `ADMISSIBLE` means only that the recorded texts support the selected method and intensity under consensus. Live Studio outcomes and exact deployed-source identity must be added before a Builder submission.
+This contract does not authenticate a sewn-in label or measure chemical compatibility, dye transfer, actual machine use, or garment damage. `ADMISSIBLE` means only that the recorded texts support the selected method and intensity under consensus. Full-consensus Studio results are linked above; they do not verify physical treatment or textile safety.
 
 License: MIT. See [LICENSE](LICENSE).
